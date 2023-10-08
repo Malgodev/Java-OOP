@@ -1,8 +1,9 @@
 package FileHandling;
 
-public interface StaffInterface {
+interface StudentInterface {
     public void viewCourse();
+    public void viewCourseNotFull();
     public void registerCourse();
     public void withdraw();
-    public void viewStaffCourse();
+    public void viewStudentCourse();
 }

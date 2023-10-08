@@ -1,14 +1,14 @@
 package FileHandling;
 
-public class User {
+public abstract class User {
     private String username, password, role;
     private Name name;
 
-    public User(String[] stringArr){
-        this.role = stringArr[0];
-        this.username = stringArr[1];
-        this.password = stringArr[2];
-        this.name = new Name(stringArr[3]);
+    public User(String role, String username, String password, String name){
+        this.role = role;
+        this.username = username;
+        this.password = password;
+        this.name = new Name(name);
     }
 
     public String getRole() { return this.role;}

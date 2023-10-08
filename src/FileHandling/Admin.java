@@ -1,10 +1,9 @@
 package FileHandling;
 
-public class Admin implements AdminInterface{
-    private Integer iDontKnowWhatToDoHelp = 0;
+public class Admin extends User implements AdminInterface{
 
-    public Admin(){
-        iDontKnowWhatToDoHelp = 1;
+    public Admin(String[] stringArr){
+        super(stringArr[0], stringArr[1], stringArr[2], stringArr[4]);
     }
 
     public void action(Integer choose){
@@ -41,8 +40,6 @@ public class Admin implements AdminInterface{
                 break;
         }
     }
-
-    public Integer kms() { return iDontKnowWhatToDoHelp;}
 
     @Override
     public void createCourse(){
@@ -125,14 +122,23 @@ public class Admin implements AdminInterface{
 
     @Override
     public void viewStudentInCourse() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'viewStudentInCourse'");
+        System.out.println("Enter Course ID:");
+        String tmpID = Main.input.nextLine();
+        Course tmpCourse = Main.getByID(tmpID);
+        if (tmpCourse != null) tmpCourse.displayStudentInCourse();
+        else System.out.println("bruh");
     }
 
     @Override
     public void studentCourse() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'studentCourse'");
+        System.out.println("Enter student ID: ");
+        String id = Main.input.nextLine();
+
+        for (Course course:Main.courses){
+            if (course.inCourse(id)){
+                course.displayCourse();
+            }
+        }
     }
 
     @Override
@@ -141,4 +147,8 @@ public class Admin implements AdminInterface{
         throw new UnsupportedOperationException("Unimplemented method 'sortStudentNum'");
     }
     
+    @Override
+    public String toString(){
+        return "string";
+    }
 }

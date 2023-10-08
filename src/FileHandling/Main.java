@@ -8,106 +8,154 @@ public class Main {
 
     public static Scanner input = new Scanner(System.in);
     public static Vector<Course> courses = new Vector<>();
+    public static Admin admin;
+    public static Vector<Student> students = new Vector<>();
+    public static Vector<Staff> staffs = new Vector<>();
 
-    public static void staffAction(User staffAcc){
-        // Staff staff;
-    }
-
-    public static void studentAction(User studentAcc){
-        System.out.println("student");
-    }
-
-    public static void adminAction(User adminAcc){
-        Admin admin = new Admin();
+    public static void adminAction(Admin admin) {
+        System.out.println("Login as Admin");
         int choose = 1;
-        while(choose != 0){
-            System.out.println("-------------------------------------------------------");
-            System.out.println("Course Management:");
-            System.out.println("\t1. Create a new course.");
-            System.out.println("\t2. Delete a course.");
-            System.out.println("\t3. Edit a course.");
-            System.out.println("\t4. Display a course.");
-            System.out.println("\t5. Add student to a course.");
-            System.out.println("Report:");
-            System.out.println("\t6. View all course");
-            System.out.println("\t7. View all course that full");
-            System.out.println("\t8. View names of students registered to a course");
-            System.out.println("\t9. View list of course a student is registered in");
-            System.out.println("\t10. Sort courses on current number of students registered");
-            System.out.println("0. Exit");
-            System.out.println("-------------------------------------------------------");
+        while (choose != 0) {
+            System.out.println("""
+                    -------------------------------------------------------
+                    Course Management:
+                        \t1. Create a new course.
+                        \t2. Delete a course.
+                        \t3. Edit a course.
+                        \t4. Display a course.
+                        \t5. Add student to a course.
+                    Report:
+                        \t6. View all course
+                        \t7. View all course that full
+                        \t8. View names of students registered to a course
+                        \t9. View list of course a student is registered in
+                        \t10. Sort courses on current number of students registered
+                        0. Exit
+                    -------------------------------------------------------
+                    """);
             choose = Integer.parseInt(input.nextLine());
-            if (choose != 0) admin.action(choose);
+            if (choose != 0)
+                admin.action(choose);
         }
     }
 
-    public static void main(String[] args) throws IOException{
-        Scanner fileSc = new Scanner(new File("src\\FileHandling\\Account.csv"));
-        Scanner getCourse = new Scanner(new File("src\\FileHandling\\course.csv"));
-        Vector<User> userAccounts = new Vector<>();
-
-        // Skip first line because master column
-        fileSc.nextLine();
-        while(fileSc.hasNextLine()){
-            String[] tmpString = fileSc.nextLine().split(", ");
-            if (tmpString.length == 4){
-                userAccounts.add(new User(tmpString));
-            }
+    public static void staffAction(Staff staffAcc) {
+        System.out.println("Login as Staff");
+        int choose = 1;
+        while (choose != 0) {
+            System.out.println("""
+            -------------------------------------------------------
+                \t1. View all courses.
+                \t2. Register teaching a course.
+                \t3. Withdraw from a course.
+                \t4. View all course that registered.
+            0. Exit
+            -------------------------------------------------------
+            """);
+            choose = Integer.parseInt(input.nextLine());
+            if (choose != 0) staffAcc.action(choose);
         }
+    }
 
-        while(getCourse.hasNextLine()){
-            String[] tmpString = getCourse.nextLine().split(", ");
-            Course tmpCourse = new Course(tmpString);
-            courses.add(tmpCourse);
+    public static void studentAction(Student studentAcc) {
+        System.out.println("Login as Student");
+        int choose = 1;
+        while (choose != 0) {
+            System.out.println("""
+            -------------------------------------------------------
+                \t1. View all courses.
+                \t2. View all courses that are not full.
+                \t3. Register a course.
+                \t4. Withdraw from a course.
+                \t5. View all courses student is registered in.
+            0. Exit
+            -------------------------------------------------------
+            """);
+            choose = Integer.parseInt(input.nextLine());
+            if (choose != 0) studentAcc.action(choose);
         }
+    }
 
-        System.out.println(courses.size());
+    public static void main(String[] args) throws IOException {
+        init();
 
-        while(true){
+        while (true) {
             System.out.println("Enter your username and password:");
             String username = input.nextLine();
             String password = input.nextLine();
 
-            String loginStatus = "bruh";
-            User loginUser = null;
+            System.out.println(admin);
 
-            for (User user : userAccounts) {
-                Integer statusCode = user.tryLogin(username, password);
+            Object user = getUser(username, password);
 
-                if (statusCode == 200){
-                    loginStatus = "Login successful";
-                    loginUser = user;
-                    break;
-                }else if (statusCode == 404){
-                    loginStatus = "Username not found, try again!";
-                }else if (statusCode == 406){
-                    loginStatus = "Wrong password, try again";
-                    break;
-                }
-            }
-
-            System.out.println(loginStatus);
-            if (loginUser != null){
-                if (loginUser.getRole().compareTo("STAFF") == 0) staffAction(loginUser);
-                else if (loginUser.getRole().compareTo("STUDENT") == 0) studentAction(loginUser);
-                else if (loginUser.getRole().compareTo("ADMIN") == 0) adminAction(loginUser);
+            if (user == null)
+                System.out.println("Wrong username or password");
+            else {
+                if (user instanceof Admin)
+                    adminAction((Admin) user);
+                else if (user instanceof Staff)
+                    staffAction((Staff) user);
+                else if (user instanceof Student)
+                    studentAction((Student) user);
             }
         }
     }
 
-    public static Course getByID(String id){
-        for (Course course : courses){
-            if (course.getID().compareTo(id) == 0){
+    private static void init() throws IOException {
+        Scanner getUser = new Scanner(new File("src\\FileHandling\\Account.csv"));
+        Scanner getCourse = new Scanner(new File("src\\FileHandling\\course.csv"));
+
+        // Skip first line because master column
+        getUser.nextLine();
+        while (getUser.hasNextLine()) {
+            String[] tmpString = getUser.nextLine().split(", ");
+            if (tmpString[0].compareTo("ADMIN") == 0)
+                admin = new Admin(tmpString);
+            else if (tmpString[0].compareTo("STAFF") == 0) {
+                Staff tmpStaff = new Staff(tmpString);
+                staffs.add(tmpStaff);
+            } else if (tmpString[0].compareTo("STUDENT") == 0) {
+                Student tmpStu = new Student(tmpString);
+                students.add(tmpStu);
+            }
+        }
+
+        // Skip first line because master column
+        getCourse.nextLine();
+        while (getCourse.hasNextLine()) {
+            String[] tmpString = getCourse.nextLine().split(", ");
+            Course tmpCourse = new Course(tmpString);
+            courses.add(tmpCourse);
+        }
+    }
+
+    private static Object getUser(String username, String password) {
+        if (admin.tryLogin(username, password) == 200) return admin;
+        for (Student student : students) {
+            if (student.tryLogin(username, password) == 200)
+                return student;
+        }
+        for (Staff staff : staffs) {
+            if (staff.tryLogin(username, password) == 200) return staff;
+        }
+        return null;
+    }
+
+    public static Course getByID(String id) {
+        for (Course course : courses) {
+            if (course.getID().compareTo(id) == 0) {
                 return course;
             }
         }
         return null;
     }
 
-    public static void updateCourse(){
-        try{
+    public static void updateCourse() {
+        try {
             FileWriter fw = new FileWriter("src\\FileHandling\\course.csv");
             PrintWriter output = new PrintWriter(fw);
+
+            output.println("course ID, name, max student, instructor, section number, location, student, ");
 
             for (Course course : courses) {
                 output.println(course);
@@ -117,6 +165,7 @@ public class Main {
 
             output.close();
             fw.close();
-        }catch(IOException e){}
+        } catch (IOException e) {
+        }
     }
 }

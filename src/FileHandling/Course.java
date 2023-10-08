@@ -7,13 +7,13 @@ public class Course {
     private String id, name, sectionNum, location;
     private Integer maxStudent;
     private Vector<String> students;
-    private Staff instructor;
+    private String instructor;
     
     public Course(String id, String name, Integer maxStudent, String sectionNum, String location){
         this.id = id;
         this.name = name;
         this.maxStudent = maxStudent;
-        instructor = new Staff();
+        instructor = "null";
         this.sectionNum = sectionNum;
         this.location = location;
         students = new Vector<>();
@@ -23,7 +23,7 @@ public class Course {
         this.id = strArr[0];
         this.name = strArr[1];
         this.maxStudent = Integer.parseInt(strArr[2]);
-        instructor = new Staff();
+        instructor = strArr[3];
         this.sectionNum = strArr[4];
         this.location = strArr[5];
 
@@ -59,8 +59,16 @@ public class Course {
         System.out.println("+----------------------------------------------+");
     }
 
+    public void addIntrustorToCourse(String s){
+        this.instructor = s;
+    }
+
     public void addStudentToCourse(String newID){
         students.add(newID);
+    }
+
+    public void removeFromCourse(String newID){
+        students.remove(newID);
     }
 
     public boolean isFull(){
@@ -72,14 +80,27 @@ public class Course {
         return this.id;
     }
 
+    public boolean inCourse(String checkID){
+        for (String id : students) {
+            if (id.compareTo(checkID) == 0) return true;
+        }
+        return false;
+    }
+
+    public String getInstructor(){ return this.instructor;}
+
     @Override
     public String toString(){
         if (id == "") return "";
 
         String tmp = String.format("%s, %s, %02d, %s, %s, %s, ", this.id, this.name, this.maxStudent, this.instructor, this.sectionNum, this.location);
-        for (int i = 0; i < students.size(); i++) {
-            tmp += students.get(i) + "|";
-        }     
+        if (students.size() == 0) tmp += " ";
+        else{
+            for (int i = 0; i < students.size(); i++) {
+                tmp += students.get(i) + "|";
+            }     
+        }
+        
         tmp += ", ";
         return tmp;
     }
